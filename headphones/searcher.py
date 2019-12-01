@@ -24,6 +24,8 @@ import datetime
 import subprocess
 import unicodedata
 import urlparse
+import requests
+import json
 
 import os
 import re
@@ -277,7 +279,8 @@ def do_sorted_search(album, new, losslessOnly, choose_specific_download=False):
                          headphones.CONFIG.WAFFLES or
                          headphones.CONFIG.RUTRACKER or
                          headphones.CONFIG.ORPHEUS or
-                         headphones.CONFIG.REDACTED)
+                         headphones.CONFIG.REDACTED or
+                         headphones.CONFIG.DEEZER)
 
     results = []
     myDB = db.DBConnection()
@@ -293,6 +296,10 @@ def do_sorted_search(album, new, losslessOnly, choose_specific_download=False):
             results = searchTorrent(album, new, losslessOnly, albumlength)
 
     elif headphones.CONFIG.PREFER_TORRENTS == 1 and not choose_specific_download:
+        logger.info(album)
+        logger.info(new)
+        logger.info(losslessOnly)
+        logger.info(albumlength)
 
         if TORRENT_PROVIDERS:
             results = searchTorrent(album, new, losslessOnly, albumlength)
@@ -324,6 +331,7 @@ def do_sorted_search(album, new, losslessOnly, choose_specific_download=False):
         return results
 
     # Filter all results that do not comply
+    logger.info(results)
     results = [result for result in results if result[5]]
 
     # Sort the remaining results
@@ -1829,6 +1837,40 @@ def searchTorrent(album, new=False, losslessOnly=False, albumlength=None,
                     except Exception as e:
                         logger.error(
                             u"An unknown error occurred in the Old Pirate Bay parser: %s" % e)
+
+    if headphones.CONFIG.DEEZER:
+        provider = "Deezer"
+        providerurl = headphones.CONFIG.DEEZLOADER_HOST
+
+        # Build URL
+        providerurl = providerurl + "/api/search/"
+
+        logger.info("Querying DeezerloaderRemix at: %s for %s", headphones.CONFIG.DEEZLOADER_HOST, term)
+
+        #data = request.request_soup(url=providerurl + category, headers=headers)
+
+        payload = json.dumps({"album": str(term)})
+        headers = {'Content-Type': "application/json"}
+
+        response = requests.request("POST", providerurl, data=payload, headers=headers)
+        if (response.status_code == 200):
+            logger.info(response.text)
+            deezerResponse = json.loads(response.text)
+            if (deezerResponse["items"] == []):
+                logger.info("No results found from Deezer using term: %s" % term)
+            else:
+                for item in deezerResponse["items"]:
+                    title = item["title"]
+                    url = item["link"]
+                    size = 0    #for now
+                    match = True
+                    
+                    resultlist.append((title, size, url, provider, "torrent", match))
+
+        else:
+            logger.info("Something went wrong with DeezerloaderRemix")
+        
+
 
     # attempt to verify that this isn't a substring result
     # when looking for "Foo - Foo" we don't want "Foobar"

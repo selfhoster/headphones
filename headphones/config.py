@@ -80,6 +80,8 @@ _CONFIG_DEFINITIONS = {
     'DELUGE_LABEL': (str, 'Deluge', ''),
     'DELUGE_DONE_DIRECTORY': (str, 'Deluge', ''),
     'DELUGE_PAUSED': (int, 'Deluge', 0),
+    'DEEZER': (int, 'Deezer', 0),
+    'DEEZLOADER_HOST': (str, 'Deezloader', ''),
     'DESTINATION_DIR': (str, 'General', ''),
     'DETECT_BITRATE': (int, 'General', 0),
     'DO_NOT_PROCESS_UNMATCHED': (int, 'General', 0),

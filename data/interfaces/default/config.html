@@ -319,6 +319,7 @@
                                 <input type="radio" name="torrent_downloader" id="torrent_downloader_utorrent" value="2" ${config['torrent_downloader_utorrent']}> uTorrent (Beta)
                                 <input type="radio" name="torrent_downloader" id="torrent_downloader_deluge" value="3" ${config['torrent_downloader_deluge']}> Deluge (Beta)
                                 <input type="radio" name="torrent_downloader" id="torrent_downloader_qbittorrent" value="4" ${config['torrent_downloader_qbittorrent']}> QBitTorrent
+                                <input type="radio" name="torrent_downloader" id="torrent_downloader_deezloader" value="5" ${config['torrent_downloader_deezloader']}> DeezloaderRemix
                             </fieldset>
                             <fieldset id="torrent_blackhole_options">
                                 <div class="row">
@@ -446,6 +447,13 @@
                                 <div class="row checkbox">
                                     <label>Add Torrent Paused</label>
                                     <input type="checkbox" name="deluge_paused" value="1" ${config['deluge_paused']}>
+                                </div>
+                            </fieldset>
+                            <fieldset id="deezloader_options">
+                                <div class="row">
+                                    <label>DeezloaderRemix URL</label>
+                                    <input type="text" name="deezloader_host" value="${config['deezloader_host']}" size="30">
+                                    <small>usually http://localhost:1730</small>
                                 </div>
                             </fieldset>
                             <fieldset id="general_torrent_options">
@@ -767,6 +775,12 @@
                                             <label>Seed Ratio</label>
                                             <input type="text" class="override-float" name="oldpiratebay_ratio" value="${config['oldpiratebay_ratio']}" size="10" title="Stop seeding when ratio met, 0 = unlimited. Scheduled job will remove torrent when post processed and finished seeding.">
                                         </div>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset>
+                                    <div class="row checkbox left">
+                                        <input id="use_deezer" type="checkbox" class="bigcheck" name="use_deezer" value="1" ${config['use_deezer']} /><label for="use_deezer"><span class="option">Deezer</span></label>
                                     </div>
                                 </fieldset>
 
@@ -2384,28 +2398,33 @@
 
                 if ($("#torrent_downloader_blackhole").is(":checked"))
                         {
-                            $("#transmission_options,#utorrent_options,#deluge_options,#qbittorrent_options").hide();
+                            $("#transmission_options,#utorrent_options,#deluge_options,#qbittorrent_options,#deezloader_options").hide();
                             $("#torrent_blackhole_options").show();
                         }
                 if ($("#torrent_downloader_transmission").is(":checked"))
                         {
-                            $("#torrent_blackhole_options,#utorrent_options,#deluge_options,#qbittorrent_options").hide();
+                            $("#torrent_blackhole_options,#utorrent_options,#deluge_options,#qbittorrent_options,#deezloader_options").hide();
                             $("#transmission_options").show();
                         }
                 if ($("#torrent_downloader_utorrent").is(":checked"))
                         {
-                            $("#torrent_blackhole_options,#transmission_options,#deluge_options,#qbittorrent_options").hide();
+                            $("#torrent_blackhole_options,#transmission_options,#deluge_options,#qbittorrent_options,#deezloader_options").hide();
                             $("#utorrent_options").show();
                         }
                 if ($("#torrent_downloader_qbittorrent").is(":checked"))
                         {
-                            $("#torrent_blackhole_options,#transmission_options,#utorrent_options,#deluge_options").hide();
+                            $("#torrent_blackhole_options,#transmission_options,#utorrent_options,#deluge_options,#deezloader_options").hide();
                             $("#qbittorrent_options").show();
                         }
                 if ($("#torrent_downloader_deluge").is(":checked"))
                         {
-                            $("#torrent_blackhole_options,#transmission_options,#utorrent_options,#qbittorrent_options").hide();
+                            $("#torrent_blackhole_options,#transmission_options,#utorrent_options,#qbittorrent_options,#deezloader_options").hide();
                             $("#deluge_options").show();
+                        }
+                if ($("#torrent_downloader_deezloader").is(":checked"))
+                        {
+                            $("#torrent_blackhole_options,#transmission_options,#utorrent_options,#deluge_options,#qbittorrent_options").hide();
+                            $("#deezloader_options").show();
                         }
 
                 $('input[type=radio]').change(function(){
@@ -2443,23 +2462,27 @@
                         }
                         if ($("#torrent_downloader_blackhole").is(":checked"))
                         {
-                            $("#transmission_options,#utorrent_options,#deluge_options,#qbittorrent_options").fadeOut("fast", function() { $("#torrent_blackhole_options").fadeIn() });
+                            $("#transmission_options,#utorrent_options,#deluge_options,#qbittorrent_options,#deezloader_options").fadeOut("fast", function() { $("#torrent_blackhole_options").fadeIn() });
                         }
                         if ($("#torrent_downloader_transmission").is(":checked"))
                         {
-                            $("#torrent_blackhole_options,#utorrent_options,#deluge_options,#qbittorrent_options").fadeOut("fast", function() { $("#transmission_options").fadeIn() });
+                            $("#torrent_blackhole_options,#utorrent_options,#deluge_options,#qbittorrent_options,#deezloader_options").fadeOut("fast", function() { $("#transmission_options").fadeIn() });
                         }
                         if ($("#torrent_downloader_utorrent").is(":checked"))
                         {
-                            $("#torrent_blackhole_options,#transmission_options,#deluge_options,#qbittorrent_options").fadeOut("fast", function() { $("#utorrent_options").fadeIn() });
+                            $("#torrent_blackhole_options,#transmission_options,#deluge_options,#qbittorrent_options,#deezloader_options").fadeOut("fast", function() { $("#utorrent_options").fadeIn() });
                         }
                         if ($("#torrent_downloader_qbittorrent").is(":checked"))
                         {
-                            $("#torrent_blackhole_options,#transmission_options,#utorrent_options,#deluge_options").fadeOut("fast", function() { $("#qbittorrent_options").fadeIn() });
+                            $("#torrent_blackhole_options,#transmission_options,#utorrent_options,#deluge_options,#deezloader_options").fadeOut("fast", function() { $("#qbittorrent_options").fadeIn() });
 			}
                         if ($("#torrent_downloader_deluge").is(":checked"))
                         {
-                            $("#torrent_blackhole_options,#utorrent_options,#transmission_options,#qbittorrent_options").fadeOut("fast", function() { $("#deluge_options").fadeIn() });
+                            $("#torrent_blackhole_options,#utorrent_options,#transmission_options,#qbittorrent_options,#deezloader_options").fadeOut("fast", function() { $("#deluge_options").fadeIn() });
+                        }
+                        if ($("#torrent_downloader_deezloader").is(":checked"))
+                        {
+                            $("#torrent_blackhole_options,#utorrent_options,#transmission_options,#deluge_options,#qbittorrent_options").fadeOut("fast", function() { $("#deezloader_options").fadeIn() });
                         }
                 });
 
@@ -2556,6 +2579,7 @@
                 initConfigCheckbox("#use_rutracker");
                 initConfigCheckbox("#use_orpheus");
                 initConfigCheckbox("#use_redacted");
+                initConfigCheckbox("#use_deezloader");
                 initConfigCheckbox("#api_enabled");
                 initConfigCheckbox("#enable_https");
                 initConfigCheckbox("#customauth");
